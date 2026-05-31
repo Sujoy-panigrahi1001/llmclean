@@ -14,8 +14,8 @@ from .core import (
     clean_dataframe,
 )
 
-__version__ = "0.1.0"
-__author__ = "Your Name"
+__version__ = "0.2.0"
+__author__ = "spanigrahidev"
 
 # Define public API
 __all__ = [
