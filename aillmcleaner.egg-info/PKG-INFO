@@ -1,6 +1,6 @@
 Metadata-Version: 2.4
 Name: aillmcleaner
-Version: 0.1.0
+Version: 0.2.0
 Summary: An AI-powered Python library for context-aware data cleaning using local LLMs
 Home-page: https://github.com/spanigrahidev/aillmcleaner
 Author: Sujoy Panigrahi
@@ -14,6 +14,8 @@ Description-Content-Type: text/markdown
 License-File: LICENSE
 Requires-Dist: pandas>=1.5.0
 Requires-Dist: requests>=2.28.0
+Requires-Dist: google-genai>=0.1.1
+Requires-Dist: openai>=1.0.0
 Dynamic: author
 Dynamic: author-email
 Dynamic: classifier
@@ -25,24 +27,207 @@ Dynamic: requires-dist
 Dynamic: requires-python
 Dynamic: summary
 
-# AILLMClean 🧹✨
+# AILLMCleaner
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
-
-An AI-powered Python package architecture for intelligent, context-aware automated data cleaning using both Local LLMs (Ollama) and high-performance Cloud AI APIs (Google Gemini, Groq, OpenAI).
+An AI-powered Python library for intelligent, context-aware automated data cleaning using both Local LLMs (Ollama) and Cloud AI APIs (Google Gemini, OpenAI, Groq).
 
 ---
 
-## 🚀 Key Architectural Advantages
-- **Universal AI Engine:** Seamlessly switch between local offline models and cloud-based hyper-fast APIs.
-- **Hybrid Deployment:** Run 100% locally via Ollama for complete data privacy, or use Cloud APIs for resource-constrained endpoints (like mobile/servers).
-- **Context-Aware Imputation:** Resolves missing entries intelligently by treating surrounding features as semantic contextual meta-layers.
+## What Does It Do?
+
+Real-world datasets are messy — names in wrong case, duplicate city names, missing values, invalid emails. aillmcleaner uses Large Language Models to understand and fix your data intelligently, not just with simple rules.
 
 ---
 
-## 📦 Installation & Setup
+## Requirements
 
-### 1. Setup Library Dependencies
-```bash
-pip install -r requirements.txt
+- Python 3.8 or higher
+- pandas
+- requests
+- openai
+- google-genai
+- One AI provider (Ollama, Gemini, OpenAI, or Groq)
+
+Install all dependencies:
+
+```
+pip install aillmcleaner
+```
+
+---
+
+## AI Provider Options
+
+Ollama — Free, runs locally on your computer. No API key needed.
+Download from: https://ollama.com
+
+Google Gemini — Free tier available.
+Get API key from: https://aistudio.google.com
+
+OpenAI (ChatGPT) — Paid service.
+Get API key from: https://platform.openai.com
+
+Groq — Free tier available, very fast.
+Get API key from: https://console.groq.com
+
+---
+
+## Installation
+
+```
+pip install aillmcleaner
+```
+
+---
+
+## Quick Start
+
+### Using Ollama (Free, No API Key Needed)
+
+First start Ollama on your computer:
+
+```
+ollama serve
+ollama pull llama3.2
+```
+
+Then use in Python:
+
+```python
+import pandas as pd
+from aillmcleaner import clean_column, standardize_column, fill_missing, detect_anomalies
+
+data = {
+    "name":    ["alice johnson", "BOB SMITH", "Charlie  Brown"],
+    "city":    ["new york", "newyork", "LA"],
+    "country": [None, "USA", "United States"]
+}
+
+df = pd.DataFrame(data)
+
+# Fix name casing
+df["name"] = clean_column(df, "name",
+    instruction="Convert to proper title case. Return only the name.")
+
+# Standardize city names
+df["city"] = standardize_column(df, "city",
+    categories=["New York", "Los Angeles", "Chicago"])
+
+# Fill missing country values
+df["country"] = fill_missing(df, "country", context_columns=["city"])
+
+print(df)
+```
+
+---
+
+### Using Google Gemini
+
+```python
+from aillmcleaner import clean_column
+
+df["name"] = clean_column(df, "name",
+    provider="gemini",
+    api_key="YOUR_GEMINI_API_KEY")
+```
+
+Or set as environment variable:
+
+```
+export GEMINI_API_KEY="your_key_here"
+```
+
+---
+
+### Using OpenAI
+
+```python
+from aillmcleaner import clean_column
+
+df["name"] = clean_column(df, "name",
+    provider="openai",
+    model="gpt-4o-mini",
+    api_key="YOUR_OPENAI_API_KEY")
+```
+
+---
+
+### Using Groq
+
+```python
+from aillmcleaner import clean_column
+
+df["name"] = clean_column(df, "name",
+    provider="groq",
+    model="llama3-8b-8192",
+    api_key="YOUR_GROQ_API_KEY")
+```
+
+---
+
+## All Available Functions
+
+clean_text — Clean a single text value.
+
+```python
+from aillmcleaner import clean_text
+result = clean_text("helo wrold", provider="gemini", api_key="YOUR_KEY")
+```
+
+clean_column — Clean an entire DataFrame column.
+
+```python
+df["name"] = clean_column(df, "name",
+    instruction="Fix spelling and capitalize properly.")
+```
+
+standardize_column — Map column values to a fixed list of categories.
+
+```python
+df["city"] = standardize_column(df, "city",
+    categories=["New York", "Los Angeles", "Chicago"])
+```
+
+fill_missing — Fill missing values using context from other columns.
+
+```python
+df["country"] = fill_missing(df, "country",
+    context_columns=["city", "state"])
+```
+
+detect_anomalies — Find suspicious or invalid values in a column.
+
+```python
+bad_values = detect_anomalies(df, "email")
+print(bad_values)
+```
+
+clean_dataframe — Clean all text columns in a DataFrame at once.
+
+```python
+from aillmcleaner import clean_dataframe
+cleaned_df = clean_dataframe(df, provider="groq", api_key="YOUR_KEY")
+```
+
+---
+
+## Provider and Model Options
+
+provider can be: ollama (default), gemini, openai, groq
+model is optional — uses the best default for each provider
+api_key is required only for cloud providers (gemini, openai, groq)
+
+---
+
+## License
+
+MIT License — free to use, modify, and distribute.
+
+---
+
+## Author
+
+Sujoy Panigrahi (spanigrahidev)
+GitHub: https://github.com/spanigrahidev
+PyPI: https://pypi.org/project/aillmcleaner/
+
